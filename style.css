@@ -1,0 +1,281 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding-top: 70px;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #fafafa;
+}
+
+#searchContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 55px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 25px;
+  background-color: #fafafa;
+  z-index: 1000;
+  /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+}
+
+#searchInput {
+  flex: 0 0 calc(82.5% - 20px);
+  margin: 0;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+#searchInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  outline: none;
+}
+
+#dollarInfo {
+  flex: 0 0 12.5%;
+  height: 42px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-left: 10px;
+  margin-right: 10px;
+  overflow: hidden;
+}
+
+#dollarInfo span {
+  display: block;
+  font-size: 16px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+#dollarInfo #dollarPrice {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#productTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px auto;
+}
+
+#productTable th,
+#productTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+}
+
+#productTable th {
+  background-color: #ddd;
+  text-align: center;
+}
+
+#productTable td {
+  text-align: left;
+}
+
+#productTable td:nth-child(3),
+#productTable td:nth-child(4),
+#productTable td:nth-child(5) {
+  text-align: center;
+}
+
+#productTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#productTable tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.btnFloat {
+  position: fixed;
+  right: 10px;
+  background-color: transparent;
+  color: #2e2e2e;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btnToggle {
+  top: 15px;
+  right: 20px;
+  z-index: 1001;
+}
+
+.btnWpp {
+  bottom: 20px;
+}
+
+.product {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+#loader {
+  text-align: center;
+  padding: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Modo oscuro */
+body.dark-mode {
+  background-color: #2e2e2e;
+  color: white;
+}
+
+body.dark-mode #searchContainer {
+  background-color: #2e2e2e;
+}
+
+body.dark-mode #productTable tr:nth-child(even) {
+  background-color: #1e1e1eb9;
+}
+
+body.dark-mode #productTable tr:nth-child(odd) {
+  background-color: #2e2e2eb9;
+}
+body.dark-mode #productTable th {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+body.dark-mode #searchInput {
+  background-color: #453e3e;
+  color: white;
+  border-color: #555;
+}
+
+body.dark-mode th {
+  background-color: #1e1e1eb9;
+  color: white;
+}
+
+body.dark-mode #dollarInfo {
+  background-color: #3e3e3e;
+  color: white;
+  border-color: #555;
+}
+
+body.dark-mode .btnFloat {
+  background-color: #2e2e2e;
+  color: #fafafa;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 120px;
+    padding-right: 0;
+  }
+
+  #searchContainer {
+    flex-direction: column;
+    padding: 20px;
+    right: 0;
+  }
+
+  #searchInput {
+    width: calc(100% - 30px);
+    margin-bottom: 10px;
+    margin-right: 40px;
+  }
+
+  #dollarInfo {
+    width: 30%;
+    height: auto;
+    padding: 0px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 2%;
+  }
+
+  .btnToggle {
+    top: 20px;
+    right: 5px;
+  }
+
+  #productTable {
+    display: block;
+    overflow-x: auto;
+  }
+
+  #productTable thead,
+  #productTable tbody,
+  #productTable th,
+  #productTable td,
+  #productTable tr {
+    display: block;
+  }
+
+  #productTable thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  #productTable tr {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+
+  #productTable td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-all;
+    text-align: left;
+  }
+
+  #productTable td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  #productTable td:nth-child(3),
+  #productTable td:nth-child(4),
+  #productTable td:nth-child(5) {
+    text-align: left;
+  }
+}
