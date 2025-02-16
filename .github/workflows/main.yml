@@ -50,7 +50,7 @@ jobs:
         # Este script se encargará de eliminar el archivo _json_compres.gz y actualizar latest-json-filename.txt
         run: python scripts/deploy_updates.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_OWNER: ${{ secrets.GITHUB_OWNER }}
-          GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
-          GITHUB_BRANCH: ${{ secrets.GITHUB_BRANCH }}
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_OWNER: ${{ secrets.GITHUB_OWNER }}
+          GIT_REPO: ${{ secrets.GITHUB_REPO }}
+          GIT_BRANCH: ${{ secrets.GITHUB_BRANCH }}
