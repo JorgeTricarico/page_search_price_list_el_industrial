@@ -3,8 +3,19 @@ name: Test and Deploy
 on:
   push:
     branches: [ dev ]
+    paths:
+      - 'price-lists-json/**'   #  Activar workflow si hay cambios en la carpeta 'price-lists-json' y subdirectorios
+      - 'scripts/deploy_updates.py' # (Opcional) Si cambios en el script deploy_updates.py también deben activar tests
+      # - 'test/**'             # (Opcional) Si también quieres activar por cambios en tests (si tienes una carpeta 'test')
+      # - 'requirements.txt'     # (Opcional) Si cambios en requirements también deben activar tests
+
   pull_request:
     branches: [ dev ]
+    paths:
+      - 'price-lists-json/**'   #  Mismos filtros que en 'push' para pull requests
+      - 'scripts/deploy_updates.py' # (Opcional) Mantener consistencia con 'push'
+      # - 'test/**'             # (Opcional) Mantener consistencia con 'push'
+      # - 'requirements.txt'     # (Opcional) Mantener consistencia con 'push'
 
 jobs:
   test:
@@ -63,3 +74,4 @@ jobs:
           GITHUB_OWNER: ${{ secrets.GITHUB_OWNER }}
           GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
           GITHUB_BRANCH: ${{ secrets.GITHUB_BRANCH }}
+          GIT_FOLDER_PATH: price-lists-json # **VARIABLE DE ENTORNO CONFIGURANDO LA CARPETA**
