@@ -5,7 +5,7 @@ on:
     branches: [ dev ]
     paths:
       - 'price-lists-json/**'   #  Activar workflow si hay cambios en la carpeta 'price-lists-json' y subdirectorios
-      - 'scripts/deploy_updates.py' # (Opcional) Si cambios en el script deploy_updates.py también deben activar tests
+      # - 'scripts/deploy_updates.py' # (Opcional) Si cambios en el script deploy_updates.py también deben activar tests
       # - 'test/**'             # (Opcional) Si también quieres activar por cambios en tests (si tienes una carpeta 'test')
       # - 'requirements.txt'     # (Opcional) Si cambios en requirements también deben activar tests
 
