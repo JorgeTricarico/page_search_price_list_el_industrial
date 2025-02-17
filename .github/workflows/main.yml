@@ -65,6 +65,7 @@ jobs:
         run: pip install requests python-dotenv
 
       - name: Run deploy updates
+        working-directory: ${{ github.workspace }} # <------------- ¡AÑADI ESTO!
         # Este script se encargará de eliminar el archivo _json_compres.gz y actualizar latest-json-filename.txt
         run: python scripts/deploy_updates.py
         env:
