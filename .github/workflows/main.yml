@@ -20,9 +20,7 @@ jobs:
 
       - name: Install dependencies (Python libraries)
         run: pip install pytest playwright
-
-      - name: Install Playwright Browsers
-        run: playwright install chromium
+             playwright install chromium
 
       - name: Wait for deployment propagation
         # Espera 30 segundos (ajusta el tiempo si es necesario)
