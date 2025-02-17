@@ -21,10 +21,19 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pytest playwright
-          playwright install
+
+      # -----------------------------------------------------
+      # **PASO AÑADIDO PARA CONFIGURAR LA ZONA HORARIA A BUENOS AIRES**
+      # -----------------------------------------------------
+      - name: Set Timezone to Buenos Aires
+        run: |
+          sudo timedatectl set-timezone America/Argentina/Buenos_Aires
+          # Verificar que se cambió correctamente (opcional, pero útil para debugging)
+          timedatectl status
+      # -----------------------------------------------------
 
       - name: Wait for deployment propagation
-        # Espera 30 segundos (ajusta el tiempo si es necesario)
+        # Espera 60 segundos (ajusta el tiempo si es necesario)
         run: sleep 60
 
       - name: Run tests
