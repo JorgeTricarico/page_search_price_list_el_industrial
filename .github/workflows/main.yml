@@ -18,10 +18,11 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install dependencies
-        run: |
-          pip install pytest playwright
-          playwright install
+      - name: Install dependencies (Python libraries)
+        run: pip install pytest playwright
+
+      - name: Install Playwright Browsers
+        run: playwright install chromium
 
       - name: Wait for deployment propagation
         # Espera 30 segundos (ajusta el tiempo si es necesario)
