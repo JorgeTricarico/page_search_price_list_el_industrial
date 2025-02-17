@@ -13,7 +13,7 @@ on:
     branches: [ dev ]
     paths:
       - 'price-lists-json/**'   #  Mismos filtros que en 'push' para pull requests
-      - 'scripts/deploy_updates.py' # (Opcional) Mantener consistencia con 'push'
+      # - 'scripts/deploy_updates.py' # (Opcional) Mantener consistencia con 'push'
       # - 'test/**'             # (Opcional) Mantener consistencia con 'push'
       # - 'requirements.txt'     # (Opcional) Mantener consistencia con 'push'
 
@@ -32,10 +32,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pytest playwright
+          playwright install chromium
 
-      # -----------------------------------------------------
-      # **PASO AÑADIDO PARA CONFIGURAR LA ZONA HORARIA A BUENOS AIRES**
-      # -----------------------------------------------------
       - name: Set Timezone to Buenos Aires
         run: |
           sudo timedatectl set-timezone America/Argentina/Buenos_Aires
