@@ -1,7 +1,186 @@
-# scripts/deploy_updates.py (MODIFICADO para COPIAR desde dev a master)
+# scripts/deploy_updates.py (MODIFICADO para COPIAR desde dev a master, CON GitHubAPI INTEGRADA)
 import os
 import requests # Necesitamos requests para descargar desde GitHub API
-from app.services.github_api import GitHubAPI  # Asegúrate de que la importación sea correcta
+import base64
+from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class GitHubAPI: # **CLASE GitHubAPI INTEGRADA DIRECTAMENTE AQUÍ**
+    def __init__(self):
+        self.token = os.getenv("GIT_TOKEN")
+        if not self.token:
+            raise ValueError("La variable de entorno GIT_TOKEN no está definida.")
+        self.owner = os.getenv("GIT_OWNER")
+        if not self.owner:
+            raise ValueError("La variable de entorno GIT_OWNER no está definida.")
+        self.repo = os.getenv("GIT_REPO")
+        if not self.repo:
+            raise ValueError("La variable de entorno GIT_REPO no está definida.")
+        self.branch = os.getenv("GIT_BRANCH", "dev")
+        if not self.branch:
+            raise ValueError("La variable de entorno GIT_BRANCH no está definida.")
+        self.push_mode = os.getenv("GIT_PUSH_MODE", "staged")
+        self.folder_path = os.getenv("GIT_FOLDER_PATH", "price-lists-json").strip('/') # **MODIFICADO:  Carpeta 'price-lists-json' por defecto**
+        self.api_url = f"https://api.github.com/repos/{self.owner}/{self.repo}/contents"
+
+    def _get_headers(self):
+        return {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/vnd.github+json"
+        }
+
+    def _get_full_path(self, path): # **NUEVA FUNCIÓN INTERNA**
+        """Construye la ruta completa incluyendo la carpeta si está definida."""
+        print(f"folder_path: {self.folder_path}")
+        if self.folder_path:
+            return f"{self.folder_path}/{path}"
+        return path
+
+
+    def get_file_sha(self, path):
+        full_path = self._get_full_path(path) # **Usar _get_full_path**
+        url = f"{self.api_url}/{full_path}" # **Usar full_path**
+        params = {"ref": self.branch}
+        response = requests.get(url, headers=self._get_headers(), params=params)
+        if response.status_code == 200:
+            return response.json().get("sha")
+        elif response.status_code == 404:
+            # El archivo no existe, lo cual es normal para una creación
+            print(f"Archivo {full_path} no encontrado; se procederá a crearlo.") # **Usar full_path en logs**
+            return None
+        else:
+            print(f"Error al obtener el SHA de {full_path}: {response.status_code} {response.text}") # **Usar full_path en logs**
+            print(self.token)
+            print(self.owner)
+            print(self.repo)
+            print(self.branch)
+            print(self.api_url)
+            return None
+
+    def create_or_update_file_binary(self, path, file_bytes, commit_message):
+        full_path = self._get_full_path(path) # **Usar _get_full_path**
+        url = f"{self.api_url}/{full_path}" # **Usar full_path**
+        b64_content = base64.b64encode(file_bytes).decode("utf-8")
+        payload = {
+            "message": commit_message,
+            "content": b64_content,
+            "branch": self.branch
+        }
+        sha = self.get_file_sha(path)
+        if sha:
+            payload["sha"] = sha
+        response = requests.put(url, headers=self._get_headers(), json=payload)
+        if response.status_code in [200, 201]:
+            print(f"Archivo '{full_path}' creado/actualizado correctamente en GitHub.")  # **Usar full_path en logs**
+            return True
+        else:
+            print(f"Error al crear/actualizar '{full_path}': {response.status_code} {response.text}")  # **Usar full_path en logs**
+            return False
+
+    def delete_file_by_pattern(self, pattern):
+        full_folder_path = self._get_full_path('') # **Obtener ruta de la carpeta base**
+        url = f"{self.api_url}{full_folder_path if full_folder_path else ''}" # **Usar ruta carpeta base en URL de listado**
+
+        params = {"ref": self.branch}
+        response = requests.get(url, headers=self._get_headers(), params=params)
+        if response.status_code == 200:
+            items = response.json()
+            for item in items:
+                full_item_path = self._get_full_path(item.get("name")) # **Usar _get_full_path para item name**
+                if item.get("type") == "file" and item.get("name").endswith(pattern):
+                    sha = item.get("sha")
+                    delete_url = f"{self.api_url}/{full_item_path}" # **Usar full_item_path para delete_url**
+                    payload = {
+                        "message": f"Eliminar archivo antiguo {item.get('name')}",
+                        "sha": sha,
+                        "branch": self.branch
+                    }
+                    del_response = requests.delete(delete_url, headers=self._get_headers(), json=payload)
+                    if del_response.status_code not in [200, 201]:
+                        print(f"Error eliminando {item.get('name')}: {del_response.status_code} {del_response.text}")
+            return True
+        else:
+            print(f"Error listando archivos: {response.status_code} {response.text}")
+            return False
+
+    def create_or_update_file_text(self, path, text_content, commit_message):
+        full_path = self._get_full_path(path) # **Usar _get_full_path**
+        url = f"{self.api_url}/{full_path}" # **Usar full_path**
+        b64_content = base64.b64encode(text_content.encode("utf-8")).decode("utf-8")
+        payload = {
+            "message": commit_message,
+            "content": b64_content,
+            "branch": self.branch
+        }
+        sha = self.get_file_sha(path)
+        if sha:
+            payload["sha"] = sha
+        response = requests.put(url, headers=self._get_headers(), json=payload)
+        if response.status_code in [200, 201]:
+            print(f"Archivo de texto '{full_path}' creado/actualizado correctamente en GitHub.") # **Usar full_path en logs**
+            return True
+        else:
+            print(f"Error al crear/actualizar archivo de texto '{full_path}': {response.status_code} {response.text}") # **Usar full_path en logs**
+            return False
+
+    def get_dynamic_file_name(self):
+        """
+        Genera el nombre del archivo con la fecha actual en formato DD-MM-YY.
+        Ejemplo: list_price_27-07-24_json_compres.gz
+        """
+        now = datetime.now()
+        date_str = now.strftime("%d-%m-%y")
+        return f"list_price_{date_str}_json_compres.gz"
+
+    def merge_branch(self, base, head, commit_message):
+        """Fusiona la rama 'head' en la rama 'base' usando el endpoint de merges de GitHub."""
+
+        url = f"https://api.github.com/repos/{self.owner}/{self.repo}/merges"
+        payload = {
+            "base": base,
+            "head": head,
+            "commit_message": commit_message
+        }
+        response = requests.post(url, headers=self._get_headers(), json=payload)
+        if response.status_code in [200, 201]:
+            print(f"Fusión de {head} en {base} exitosa.")
+            return True
+        else:
+            print(f"Error al fusionar {head} en {base}: {response.status_code} {response.text}")
+            return False
+
+    def get_file_text_content(self, path): # **NUEVA FUNCIÓN en GitHubAPI**
+        """Obtiene el contenido de un archivo de texto desde GitHub."""
+        full_path = self._get_full_path(path)
+        url = f"{self.api_url}/{full_path}"
+        params = {"ref": self.branch}
+        response = requests.get(url, headers=self._get_headers(), params=params)
+        if response.status_code == 200:
+            return response.text
+        elif response.status_code == 404:
+            print(f"Archivo de texto '{full_path}' no encontrado en rama '{self.branch}'.")
+            return None
+        else:
+            print(f"Error al obtener archivo de texto '{full_path}' en rama '{self.branch}': {response.status_code} {response.text}")
+            return None
+
+    def download_file_binary(self, path): # **NUEVA FUNCIÓN en GitHubAPI**
+        """Descarga el contenido binario de un archivo desde GitHub."""
+        full_path = self._get_full_path(path)
+        url = f"{self.api_url}/{full_path}"
+        params = {"ref": self.branch}
+        response = requests.get(url, headers=self._get_headers(), params=params)
+        if response.status_code == 200:
+            return response.content # response.content devuelve el contenido binario
+        elif response.status_code == 404:
+            print(f"Archivo binario '{full_path}' no encontrado en rama '{self.branch}'.")
+            return None
+        else:
+            print(f"Error al descargar archivo binario '{full_path}' en rama '{self.branch}': {response.status_code} {response.text}")
+            return None
+
 
 def main():
     github_api_dev = GitHubAPI() # Instancia para operar en la rama dev (por defecto)
@@ -47,36 +226,6 @@ def main():
     except Exception as e:
         print(f"Error en deploy_updates.py al actualizar archivos de GitHub en master: {e}")
         print(f"Detalles del error: {e}")
-
-def get_file_text_content(self, path): # **NUEVA FUNCIÓN en GitHubAPI para obtener contenido de texto**
-    """Obtiene el contenido de un archivo de texto desde GitHub."""
-    full_path = self._get_full_path(path)
-    url = f"{self.api_url}/{full_path}"
-    params = {"ref": self.branch}
-    response = requests.get(url, headers=self._get_headers(), params=params)
-    if response.status_code == 200:
-        return response.text
-    elif response.status_code == 404:
-        print(f"Archivo de texto '{full_path}' no encontrado en rama '{self.branch}'.")
-        return None
-    else:
-        print(f"Error al obtener archivo de texto '{full_path}' en rama '{self.branch}': {response.status_code} {response.text}")
-        return None
-
-def download_file_binary(self, path): # **NUEVA FUNCIÓN en GitHubAPI para descargar binario**
-    """Descarga el contenido binario de un archivo desde GitHub."""
-    full_path = self._get_full_path(path)
-    url = f"{self.api_url}/{full_path}"
-    params = {"ref": self.branch}
-    response = requests.get(url, headers=self._get_headers(), params=params)
-    if response.status_code == 200:
-        return response.content # response.content devuelve el contenido binario
-    elif response.status_code == 404:
-        print(f"Archivo binario '{full_path}' no encontrado en rama '{self.branch}'.")
-        return None
-    else:
-        print(f"Error al descargar archivo binario '{full_path}' en rama '{self.branch}': {response.status_code} {response.text}")
-        return None
 
 
 if __name__ == "__main__":
