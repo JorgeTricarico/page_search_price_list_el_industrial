@@ -190,6 +190,7 @@ def main():
     # 1. Obtener el nombre del último archivo JSON desde la rama 'dev'
     try:
         latest_filename_dev_txt_content = github_api_dev.get_file_text_content("latest-json-filename.txt")
+        print("Contenido de latest-json-filename.txt:", github_api_dev.get_file_text_content("latest-json-filename.txt"))
         if latest_filename_dev_txt_content:
             latest_json_filename_dev = latest_filename_dev_txt_content.strip() # Eliminar espacios/saltos de línea
             print(f"Nombre del último archivo JSON en dev: {latest_json_filename_dev}")
