@@ -1,7 +1,7 @@
 # scripts/deploy_updates.py (MODIFICADO para COPIAR desde dev a master, CON GitHubAPI INTEGRADA)
 import os
 import requests # Necesitamos requests para descargar desde GitHub API
-import base64
+import base64, json
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -191,13 +191,23 @@ def main():
     try:
         latest_filename_dev_txt_content = github_api_dev.get_file_text_content("latest-json-filename.txt")
         print("Contenido de latest-json-filename.txt:", github_api_dev.get_file_text_content("latest-json-filename.txt"))
-        file_info = github_api_dev.get_file_text_content("latest-json-filename.txt")
 
-        # Extraer y decodificar el contenido
+        # Obtener el contenido del archivo como string
+        file_info_str = github_api_dev.get_file_text_content("latest-json-filename.txt")
+        
+        # Convertir el string JSON en un diccionario
+        try:
+            file_info = json.loads(file_info_str)  # <-- Aquí parseamos correctamente el JSON
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error al decodificar JSON: {e}")
+        
+        # Verificar y decodificar contenido en base64
         if "content" in file_info and "encoding" in file_info and file_info["encoding"] == "base64":
             latest_filename_dev_txt_content = base64.b64decode(file_info["content"]).decode("utf-8").strip()
         else:
             raise ValueError("No se pudo obtener el contenido en base64 del archivo latest-json-filename.txt")
+        
+        print("Contenido decodificado:", latest_filename_dev_txt_content)
         
         print("Contenido decodificado:", latest_filename_dev_txt_content)
         if latest_filename_dev_txt_content:
