@@ -11,11 +11,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   let products = [];
   let searchTimeout;
 
-  // Función para obtener el nombre del archivo JSON desde latest-json-filename.txt en la raíz
+  // Función para obtener el nombre del archivo JSON desde /price-lists-json/
   const getLatestJsonFileName = async () => {
       try {
-          console.log("Obteniendo nombre del archivo JSON desde /latest-json-filename.txt (raíz del sitio)...");
-          const response = await fetch("/latest-json-filename.txt"); // Fetch desde la raíz del sitio web
+          console.log("Obteniendo nombre del archivo JSON desde /price-lists-json/latest-json-filename.txt (raíz del sitio)...");
+          const response = await fetch("/price-lists-json/latest-json-filename.txt"); // Fetch desde la raíz del sitio web
           if (!response.ok) {
               throw new Error("No se pudo obtener el nombre del archivo JSON desde /latest-json-filename.txt");
           }
