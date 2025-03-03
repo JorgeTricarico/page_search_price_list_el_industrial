@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const themeToggle = document.getElementById("themeToggle");
   const dollarPriceElement = document.getElementById("dollarPrice");
   const fechaListaElement = document.getElementById("fechaLista");
-  const fetchPricesButton = document.getElementById("fetch-prices-button"); // Nuevo botón para obtener listas
+  const fetchPricesButton = document.getElementById("fetch-prices-button");
 
   let currentJsonFileName = "";
   let products = [];
@@ -14,8 +14,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Función para obtener el nombre del archivo JSON desde /price-lists-json/
   const getLatestJsonFileName = async () => {
       try {
-          console.log("Obteniendo nombre del archivo JSON desde /price-lists-json/latest-json-filename.txt (raíz del sitio)...");
-          const response = await fetch("/price-lists-json/latest-json-filename.txt"); // Fetch desde la raíz del sitio web
+          console.log("Obteniendo nombre del archivo JSON desde /price-lists-json/latest-json-filename.txt ...");
+          const response = await fetch("price-lists-json/latest-json-filename.txt"); 
+          console.log(response)
           if (!response.ok) {
               throw new Error("No se pudo obtener el nombre del archivo JSON desde /latest-json-filename.txt");
           }
