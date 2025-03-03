@@ -69,8 +69,8 @@ jobs:
         # Este script se encargará de eliminar el archivo _json_compres.gz y actualizar latest-json-filename.txt
         run: python scripts/deploy_updates.py
         env:
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-          GIT_OWNER: ${{ secrets.GIT_OWNER }}
-          GIT_REPO: ${{ secrets.GIT_REPO }}
-          GIT_BRANCH: ${{ secrets.GIT_BRANCH }}
+          GIT_TOKEN: ${{ vars.GIT_TOKEN }}
+          GIT_OWNER: ${{ vars.GIT_OWNER }}
+          GIT_REPO: ${{ vars.GIT_REPO }}
+          GIT_BRANCH: ${{ vars.GIT_BRANCH }}
           GIT_FOLDER_PATH: price-lists-json # **VARIABLE DE ENTORNO CONFIGURANDO LA CARPETA**
