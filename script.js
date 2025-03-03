@@ -42,42 +42,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const fetchAndDecompressProducts = async () => {
-      console.log("Cargando y descomprimiendo productos desde:", currentJsonFileName);
-      loader.classList.remove("hidden");
-      try {
-          // **MODIFICADO: Usar la carpeta 'price-lists-json' **
-          const jsonFileUrl = `/price-lists-json/${currentJsonFileName}`; // Asumiendo carpeta 'price-lists-json' en la raíz
-          console.log("Intentando cargar el archivo JSON desde:", jsonFileUrl); // Mensaje de log para la URL construida
+    console.log("Cargando y descomprimiendo productos desde:", currentJsonFileName);
+    loader.classList.remove("hidden");
+    try {
+        // **MODIFICADO: Usar la carpeta 'price-lists-json' **
+        const jsonFileUrl = `/price-lists-json/${currentJsonFileName}`; // Asumiendo carpeta 'price-lists-json' en la raíz
+        console.log("Intentando cargar el archivo JSON desde:", jsonFileUrl); // Mensaje de log para la URL construida
 
-          const response = await fetch(jsonFileUrl); // Usar la URL construida
-          if (!response.ok) {
-              throw new Error(`Error en la respuesta de red al cargar ${jsonFileUrl}`); // Mensaje de error más descriptivo
-          }
+        const response = await fetch(jsonFileUrl); // Usar la URL construida
+        if (!response.ok) {
+            throw new Error(`Error en la respuesta de red al cargar ${jsonFileUrl}: ${response.status} ${response.statusText}`); // Mensaje de error más descriptivo
+        }
 
-          // Descomprimir el stream gzip
-          const compressedStream = response.body.pipeThrough(new DecompressionStream("gzip"));
-          const reader = compressedStream.getReader();
-          const decoder = new TextDecoder("utf-8");
-          let jsonText = "";
+        // Descomprimir el stream gzip
+        const compressedStream = response.body.pipeThrough(new DecompressionStream("gzip"));
+        const reader = compressedStream.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let jsonText = "";
 
-          while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              jsonText += decoder.decode(value, { stream: true });
-          }
-          jsonText += decoder.decode();
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            jsonText += decoder.decode(value, { stream: true });
+        }
+        jsonText += decoder.decode();
 
-          products = JSON.parse(jsonText);
-          console.log("Productos descomprimidos:", products);
+        products = JSON.parse(jsonText);
+        console.log("Productos descomprimidos:", products);
 
-          // Guardamos en localStorage para cachear según el nombre del archivo
-          localStorage.setItem("products", JSON.stringify(products));
-          localStorage.setItem("jsonFileName", currentJsonFileName);
-          displayProducts(products);
-      } catch (error) {
-          console.error("Error al cargar los productos:", error);
-      }
-      loader.classList.add("hidden");
+        // Guardamos en localStorage para cachear según el nombre del archivo
+        localStorage.setItem("products", JSON.stringify(products));
+        localStorage.setItem("jsonFileName", currentJsonFileName);
+        displayProducts(products);
+    } catch (error) {
+        console.error("Error al cargar los productos:", error);
+    }
+    loader.classList.add("hidden");
   };
 
   const displayProducts = (productsToDisplay) => {
