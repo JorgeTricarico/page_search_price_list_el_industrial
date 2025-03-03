@@ -186,6 +186,7 @@ def main():
     github_api_dev = GitHubAPI() # Instancia para operar en la rama dev (por defecto)
     github_api_master = GitHubAPI() # Instancia para operar en la rama master (modificaremos branch)
     github_api_master.branch = "master" # Cambiamos la rama de la instancia para master
+    github_api_dev.branch = "dev"
 
     # 1. Obtener el nombre del último archivo JSON desde la rama 'dev'
     try:
