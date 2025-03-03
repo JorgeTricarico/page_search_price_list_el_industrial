@@ -191,6 +191,15 @@ def main():
     try:
         latest_filename_dev_txt_content = github_api_dev.get_file_text_content("latest-json-filename.txt")
         print("Contenido de latest-json-filename.txt:", github_api_dev.get_file_text_content("latest-json-filename.txt"))
+        file_info = github_api_dev.get_file_text_content("latest-json-filename.txt")
+
+        # Extraer y decodificar el contenido
+        if "content" in file_info and "encoding" in file_info and file_info["encoding"] == "base64":
+            latest_filename_dev_txt_content = base64.b64decode(file_info["content"]).decode("utf-8").strip()
+        else:
+            raise ValueError("No se pudo obtener el contenido en base64 del archivo latest-json-filename.txt")
+        
+        print("Contenido decodificado:", latest_filename_dev_txt_content)
         if latest_filename_dev_txt_content:
             latest_json_filename_dev = latest_filename_dev_txt_content.strip() # Eliminar espacios/saltos de línea
             print(f"Nombre del último archivo JSON en dev: {latest_json_filename_dev}")
